@@ -68,24 +68,80 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const Router = __webpack_require__(1);
+const Inbox = __webpack_require__(2);
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  const sidebarNavLi = document.querySelector('.sidebar-nav li');
-  sidebarNavLi.addEventListener("click", () => {
+  const sidebarNav = document.querySelector('.sidebar-nav');
+  sidebarNav.addEventListener("click", () => {
     event.preventDefault();
     const element = event.target;
     const newLocation = element.innerText.toLowerCase();
     window.location.hash = newLocation;
   });
 
-
-
-
-
+  const content = document.querySelector('.content');
+  const router = new Router(content, routes);
+  router.start();
 
 });
+
+const routes = {
+  inbox: new Inbox()
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+class Router{
+  constructor(node, routes) {
+    this.node = node;
+    this.routes = routes;
+  }
+
+  start(){
+    this.render();
+    window.addEventListener('hashchange', () => {
+      this.render();
+    });
+  }
+
+  activeRoute(){
+    const currentRoute = window.location.hash.slice(1);
+    return this.routes[currentRoute];
+  }
+
+  render(){
+    const component = this.activeRoute();
+    this.node.innerHTML = "";
+    if (component) {
+      this.node.appendChild(component.render());
+    }
+  }
+}
+
+module.exports = Router;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+class Inbox {
+  render() {
+    const ul = document.createElement("ul");
+    ul.className += "messages";
+    ul.innerHTML = "An Inbox Message";
+    return ul;
+  }
+}
+
+module.exports = Inbox;
 
 
 /***/ })
